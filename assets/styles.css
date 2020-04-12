@@ -1,0 +1,82 @@
+#drop_single .VirtualizedSelectOption {
+  background-color: '#303030';
+  color: black;
+  border-color: white;
+  }
+
+#drop_single .VirtualizedSelectFocusedOption {
+  background-color: '#303030';
+  border-color: white;
+  color: black;
+}
+
+#drop_single .Select-has-value {
+  border-color: #fff;
+  color: #fff;
+  margin-top: 10;
+  margin-bottom: 10;
+}
+
+#drop_single .Select-multi-value-wrapper {
+  color: #fff;
+}
+
+#drop_single .Select-input > input{
+  color: #fff;
+}
+
+#drop_single .Select-value-label {
+  border-color: #fff;
+  color: #fff;
+  margin-top: 10;
+  margin-bottom: 10;
+}
+
+#drop_single .is-focused:not(.is-open) > .Select-control {
+  border-color: orange;
+  box-shadow: 0 0 0 3px #fcba0366;
+  color: white
+}
+
+#drop_multi .VirtualizedSelectOption {
+  background-color: '#303030';
+  color: black;
+  border-color: white;
+  }
+
+#drop_multi .VirtualizedSelectFocusedOption {
+  background-color: '#303030';
+  border-color: white;
+  color: black;
+}
+
+#drop_multi .Select--multi .Select-value {
+  border-color: #fff;
+  color: #fff;
+  margin-top: 10;
+  margin-bottom: 10;
+}
+
+#drop_multi .Select-value-icon {
+  border-color: #fff;
+  color: #fff;
+  outline: none;
+}
+
+#drop_multi .is-focused:not(.is-open) > .Select-control {
+  border-color: orange;
+  box-shadow: 0 0 0 3px #fcba0366;
+  outline: none
+}
+
+#drop_multi .Select-input > input{
+  color: #fff;
+}
+
+#drop_single .Select.is-open {
+    z-index: 1003;
+}
+
+#drop_multi .Select.is-open {
+    z-index: 1003;
+}
