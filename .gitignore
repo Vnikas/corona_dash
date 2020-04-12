@@ -3,4 +3,4 @@
 .ipynb_checkpoints 
 corona_dash_venv/
 __pycache__
-data/
+data/raw_data/
