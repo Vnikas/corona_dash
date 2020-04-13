@@ -66,7 +66,7 @@ def plot_metric_evolution_per_country(data, country, metric):
     return fig
 
 
-def plot_metric_trajectory(data, country, metric):
+def plot_metric_trajectory(data, country, metric, is_main_country):
     if metric == 'confirmed':
         total_metric_text = 'Total Confirmed Cases'
         weekly_metric_text = 'Weekly Confirmed Cases'
@@ -96,6 +96,17 @@ def plot_metric_trajectory(data, country, metric):
                          weekly_metric_text + \
                          ': ' + \
                          df_[weekly_metric_col].map(str)
+    if is_main_country:
+        marker_size = 6
+        line_width = 3
+        label_line_width = 3
+        label_marker_size = 8
+    else:
+        marker_size = 4
+        line_width = 1,
+        label_line_width = 2
+        label_marker_size = 6
+
 
     fig = {
         'data': [
@@ -103,7 +114,10 @@ def plot_metric_trajectory(data, country, metric):
                 'x': df_[metric_col],
                 'y': df_[weekly_metric_col],
                 'mode': 'lines+markers',
-                'marker': {'size': 4},
+                'marker': {'size': marker_size},
+                'line': {
+                        'width': line_width
+                        },
                 'hoverinfo': 'text',
                 'hovertext': df_['hovertexts']
             }
@@ -115,9 +129,9 @@ def plot_metric_trajectory(data, country, metric):
                 'textposition': 'middle right',
                 'mode': 'markers+text',
                 'marker': {
-                    'size': 6,
+                    'size': label_marker_size,
                     'line': {
-                        'width': 1,
+                        'width': label_line_width,
                         'color': 'white',
                     },
                     'color': 'grey'

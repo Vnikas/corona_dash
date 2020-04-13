@@ -10,6 +10,7 @@ from plotly.io import templates
 import dash_table.FormatTemplate as FormatTemplate
 from dash_table.Format import Format, Scheme, Sign, Symbol
 
+# Read and data and create a summary dataframe to be used in dash table
 data = pd.read_csv('./data/processed_data.csv')
 data.population = data.population.fillna(0).map(int)
 last_update = data.date.max()
@@ -45,28 +46,7 @@ ref_countries = [
     'China'
 ]
 
-fig1 = covid_plot.plot_flat_deaths(data=data,
-                                   country='Greece',
-                                   ref_countries=ref_countries,
-                                   num_deaths=3)
-fig2 = covid_plot.plot_rate_deaths(data=data,
-                                   country='Greece',
-                                   ref_countries=ref_countries,
-                                   death_rate=0.1)
-fig3 = covid_plot.plot_metric_evolution_per_country(data, 'Greece', 'confirmed')
-fig4 = covid_plot.plot_metric_evolution_per_country(data, 'Greece', 'deaths')
-fig5 = covid_plot.plot_metric_trajectory(data, 'Greece', 'confirmed')
-fig6 = covid_plot.plot_metric_trajectory(data, 'Greece', 'deaths')
-
-
-dark_theme = templates['plotly_dark']._compound_props
-
-fig1['layout']['template'] = dark_theme
-fig2['layout']['template'] = dark_theme
-fig3['layout']['template'] = dark_theme
-fig4['layout']['template'] = dark_theme
-fig5['layout']['template'] = dark_theme
-fig6['layout']['template'] = dark_theme
+# Setting options for dropdowns
 country_options = []
 for c in data.country.unique().tolist():
     country_options.append(
@@ -124,11 +104,14 @@ def build_table(table_data):
         ])
     return d_table
 
+dark_theme = templates['plotly_dark']._compound_props
 
+# Create the app
 app = dash.Dash('Example', external_stylesheets=[dbc.themes.DARKLY])
 app.css.config.serve_locally = False
 server = app.server
-# Boostrap CSS.
+
+# Append Boostrap CSS
 app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
 
 
@@ -144,7 +127,7 @@ app.layout = html.Div([
                 }
                 )], className='row'),
     html.Div([
-        html.H3('Last Update: ' + last_update,
+        html.H2('Last Update: ' + last_update,
                 className='twelve columns',
                 style={
                     'margin-left': 0,
@@ -153,6 +136,22 @@ app.layout = html.Div([
                     'font-size': '55'
                 }
                 )], className='row'),
+    html.Div([
+        html.H4([
+            'The unprocessed data for this dashboard were taken from ',
+            html.A('here', href = 'https://github.com/CSSEGISandData/COVID-19'),
+            '.',
+            html.Br(),
+            'The code for the data preparation and the app can be found ',
+            html.A('here', href = 'https://github.com/Vnikas/corona_dash'),
+            '.'],
+            className='twelve columns',
+            style={
+                'margin-left': 0,
+                'color': 'lightgrey',
+                'textAlign': 'center',
+                'font-size': '55'
+                    })], className='row'),
     html.Div([
         html.Div(
             id='drop_single', children=[
@@ -209,8 +208,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             dcc.Graph(
-                id='cases_evolution',
-                figure=fig3
+                id='cases_evolution'
             )
             ],
             className='six columns',
@@ -234,8 +232,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             dcc.Graph(
-                id='trajectory_cases',
-                figure=fig5
+                id='trajectory_cases'
             )
             ],
             className='six columns',
@@ -246,8 +243,7 @@ app.layout = html.Div([
         ),
         html.Div([
             dcc.Graph(
-                id='trajectory_deaths',
-                figure=fig6
+                id='trajectory_deaths'
             )
             ],
             className='six columns',
@@ -260,8 +256,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             dcc.Graph(
-                id='deaths_growth',
-                figure=fig1
+                id='deaths_growth'
             )
             ],
             className='six columns',
@@ -272,8 +267,7 @@ app.layout = html.Div([
         ),
         html.Div([
             dcc.Graph(
-                id='deaths_rate',
-                figure=fig2
+                id='deaths_rate'
             )
             ],
             className='six columns',
@@ -342,12 +336,20 @@ def update_graph(value):
 def update_graph(country_value, reference_values):
         if country_value is None:
             country_value = 'World'
-        new_fig = covid_plot.plot_metric_trajectory(data, country_value, 'confirmed')
+        new_fig = covid_plot.plot_metric_trajectory(
+            data=data, 
+            country=country_value, 
+            metric='confirmed',
+            is_main_country=True)
         new_fig['layout']['template'] = dark_theme
         if reference_values is None:
             return new_fig
         for ref_country in reference_values:
-            ref_fig = covid_plot.plot_metric_trajectory(data, ref_country, 'confirmed')
+            ref_fig = covid_plot.plot_metric_trajectory(
+                data=data, 
+                country=ref_country, 
+                metric='confirmed',
+                is_main_country=False)
             new_fig['data'] = new_fig['data'] + ref_fig['data']
         return new_fig
 
@@ -360,12 +362,20 @@ def update_graph(country_value, reference_values):
 def update_graph(country_value, reference_values):
     if country_value is None:
         country_value = 'World'
-    new_fig = covid_plot.plot_metric_trajectory(data, country_value, 'deaths')
+    new_fig = covid_plot.plot_metric_trajectory(
+        data=data, 
+        country=country_value, 
+        metric='deaths', 
+        is_main_country=True)
     new_fig['layout']['template'] = dark_theme
     if reference_values is None:
         return new_fig
     for ref_country in reference_values:
-        ref_fig = covid_plot.plot_metric_trajectory(data, ref_country, 'deaths')
+        ref_fig = covid_plot.plot_metric_trajectory(
+            data=data, 
+            country=ref_country, 
+            metric='deaths',
+            is_main_country=False)
         new_fig['data'] = new_fig['data'] + ref_fig['data']
     return new_fig
 
