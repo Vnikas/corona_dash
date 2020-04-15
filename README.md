@@ -23,7 +23,7 @@ $ git clone https://github.com/Vnikas/corona_dash.git
 2. Create a virtual environment and install all packages needed.
 ```bash
 $ python3 -m venv corona-env
-$ source corona/bin/activate
+$ source corona-env/bin/activate
 $ pip install -r requirements.txt
 ```
 3. Download and prepare data.

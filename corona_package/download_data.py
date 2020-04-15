@@ -13,6 +13,9 @@ for date in dates:
 	url = prefix + date + '.csv'
 	try:
 		pd.read_csv(url).to_csv('./data/raw_data/' + date + '.csv', index=False)
+		max_date = date
 	except:
 		continue
+
+print('Downloaded data until: ', max_date)
 
