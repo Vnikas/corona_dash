@@ -32,7 +32,8 @@ def fix_version_issues(data):
         '^.*Congo.*$': 'Congo',
         '^.*Russia.*$': 'Russia',
         '^.*Taiwan.*$': 'Taiwan',
-        '^.*United Kingdom.*$': 'UK',
+        '^.*UK.*$': 'United Kingdom',
+        '^.*US.*$': 'United States',
         '^.*Viet Nam.*$': 'VietNam'
     }
     data['date'] = pd.to_datetime(data['date'])

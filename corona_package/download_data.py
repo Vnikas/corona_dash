@@ -8,14 +8,15 @@ last_date = date.today()
 num_days = (last_date - first_date).days
 dates = [(first_date + timedelta(days=d)).strftime(format='%m-%d-%Y') for d in range(num_days)]
 urls = [prefix + date + '.csv' for date in dates]
+max_date = date(1900,1,1)
 
 for date in dates:
 	url = prefix + date + '.csv'
 	try:
-		pd.read_csv(url).to_csv('./data/raw_data/' + date + '.csv', index=False)
+		pd.read_csv(url).to_csv('~/corona_dash/data/raw_data/' + date + '.csv', index=False)
 		max_date = date
 	except:
-		continue
+		continue	
 
 print('Downloaded data until: ', max_date)
 

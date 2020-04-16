@@ -5,3 +5,4 @@ corona_dash_venv/
 __pycache__
 data/raw_data/
 .DS_Store
+data/.DS_Store
