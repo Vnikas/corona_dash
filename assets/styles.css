@@ -80,3 +80,54 @@
 #drop_multi .Select.is-open {
     z-index: 1003;
 }
+
+#slider .rc-slider-track {
+  background-color: darkorange;
+}
+
+#slider .rc-slider-dot-active {
+  border-color: darkorange;
+}
+
+#slider .rc-slider-dot {
+  border-color: white;
+}
+
+#slider .rc-slider-handle {
+  border: solid 2px darkorange;
+}
+
+#slider .rc-slider-mark-text-active {
+  color: darkorange;
+}
+
+#slider .rc-slider-handle-click-focused {
+  border: solid 2px darkorange;
+}
+
+#slider .rc-slider-handle-click-focused:focus {
+  border-color: darkorange;
+  box-shadow: darkorange;
+}
+
+#slider .rc-slider-handle:hover {
+  border: solid 2px darkorange;
+  box-shadow: darkorange;
+  border-color: darkorange;
+}
+
+#slider .rc-slider-handle:focus {
+  box-shadow: darkorange;
+  border: solid 2px darkorange;
+
+}
+
+#slider .rc-slider-dot-active {
+  border-color: darkorange;
+}
+
+#slider .rc-slider-handle:active {
+  border: solid 2px darkorange;
+  box-shadow: 0 0 0 5px darkorange;
+  border-color: darkorange;
+}
