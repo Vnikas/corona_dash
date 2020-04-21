@@ -201,9 +201,36 @@ app.layout = html.Div([
         className='row'),
     html.Div([
         html.Div([
-            build_table(summary_df)
+            html.Br(),
+            build_table(summary_df),
+            html.Br()
             ],
             className='12 columns', style={'width': 1600, 'margin': '0 auto'})],
+        className='row'),
+    html.Div([
+        html.Div(
+            children=[
+            html.H3('Filter table\'s countries based on population'),
+            dcc.RangeSlider(
+                id='slider',
+                min=0,
+                max=1,
+                value=[0, 1],
+                step=.25,
+                marks={
+                    0: {'label': '0'},
+                    .25: {'label': '1,4M (Q1)'},
+                    .50: {'label': '8M (Median)'},
+                    .75: {'label': '28M (Q3)'},
+                    1: {'label': '1,5B'}
+                }
+            ) 
+            ],
+            className='12 columns', style={
+                'width': 800, 
+                'margin': '0 auto', 
+                'border': '1px lightgrey solid'}
+                )],
         className='row'),
     html.Div([
         html.Div([
@@ -214,7 +241,8 @@ app.layout = html.Div([
             className='six columns',
             style={
                 'margin-left': 0,
-                'margin-bottom': 20
+                'margin-bottom': 20,
+                'margin-top': 20
             }
         ),
         html.Div([
@@ -225,7 +253,8 @@ app.layout = html.Div([
             className='six columns',
             style={
                 'margin-left': 0,
-                'margin-bottom': 20
+                'margin-bottom': 20,
+                'margin-top': 20
             }
         )
         ], className='row'),
@@ -286,9 +315,10 @@ app.layout = html.Div([
 @app.callback(
     Output(component_id='summary_table', component_property='data'),
     [Input(component_id='country_dropdown', component_property='value'),
-     Input(component_id='reference_dropdown', component_property='value')]
+     Input(component_id='reference_dropdown', component_property='value'),
+     Input(component_id='slider', component_property='value')]
 )
-def update_table(country_value, reference_values):
+def update_table(country_value, reference_values, slider_value):
     if (country_value is None or len(country_value) < 1) and \
             (reference_values is None or len(reference_values) < 1):
         summary_data = summary_df
@@ -299,6 +329,18 @@ def update_table(country_value, reference_values):
     else:
         summary_countries = [country_value] + reference_values
         summary_data = summary_df[summary_df.Country.isin(summary_countries)].reset_index(drop=True)
+    world_info = summary_data[summary_data.Country == 'World']
+    from_q = summary_data[(summary_data.Country != 'World') & 
+        (summary_data.Population > 0)].Population\
+        .quantile(slider_value[0])
+    to_q = summary_data[(summary_data.Country != 'World') & 
+        (summary_data.Population > 0)].Population\
+        .quantile(slider_value[1])
+    summary_data = summary_data[(summary_data.Population >= from_q) & 
+        (summary_data.Population <= to_q)]
+    summary_data = summary_data.append(world_info, ignore_index=True)\
+        .sort_values('Total cases', ascending=False).reset_index(drop=True)
+
     return summary_data.to_dict('records')
 
 # Update Plots

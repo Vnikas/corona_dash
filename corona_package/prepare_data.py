@@ -34,8 +34,18 @@ def fix_version_issues(data):
         '^.*Taiwan.*$': 'Taiwan',
         '^.*UK.*$': 'United Kingdom',
         '^.*US.*$': 'United States',
-        '^.*Viet Nam.*$': 'VietNam'
+        '^.*Viet Nam.*$': 'Vietnam',
+        '^.*Palesti.*$': 'State of Palestine',
+        '^.*Gaza.*$': 'State of Palestine',
+        '^.*Ivory.*$': 'Cote d\'Ivoire',
+        '^.*VietNam.*$': 'Vietnam',
+        '^.*Burma.*$': 'Myanmar',
+        '^.*St. Martin.*$': 'Saint Martin',
+        '^.*Verde*$': 'Cape Verde',
+        '^.*Timor-Leste*$': 'East Timor',
+        '^.*Jersey*$': 'Channel Islands'
     }
+
     data['date'] = pd.to_datetime(data['date'])
     data['country'] = np.where(data.Country_Region.isna(),
                                data['Country/Region'],
