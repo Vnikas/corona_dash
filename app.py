@@ -35,8 +35,8 @@ summary_df = summary_df.sort_values('Total cases', ascending=False).reset_index(
 summary_df = summary_df.rename(columns={'country': 'Country'})
 
 ref_countries = [
-    'US',
-    'UK',
+    'United States',
+    'United Kingdom',
     'Sweden',
     'Turkey',
     'Italy',
