@@ -319,27 +319,29 @@ app.layout = html.Div([
      Input(component_id='slider', component_property='value')]
 )
 def update_table(country_value, reference_values, slider_value):
+    # apply population filer
+    world_info = summary_df[summary_df.Country == 'World']
+    from_q = summary_df[(summary_df.Country != 'World') & 
+        (summary_df.Population > 0)].Population\
+        .quantile(slider_value[0])
+    to_q = summary_df[(summary_df.Country != 'World') & 
+        (summary_df.Population > 0)].Population\
+        .quantile(slider_value[1])
+    summary_df_ = summary_df[(summary_df.Population >= from_q) & 
+        (summary_df.Population <= to_q)]
+    summary_df_ = summary_df_.append(world_info, ignore_index=True)\
+        .sort_values('Total cases', ascending=False).reset_index(drop=True)
+
     if (country_value is None or len(country_value) < 1) and \
             (reference_values is None or len(reference_values) < 1):
-        summary_data = summary_df
+        summary_data = summary_df_
     elif reference_values is None:
-        summary_data = summary_df[summary_df.Country == country_value].reset_index(drop=True)
+        summary_data = summary_df_[summary_df_.Country == country_value].reset_index(drop=True)
     elif country_value is None:
-        summary_data = summary_df[summary_df.Country.isin(reference_values)].reset_index(drop=True)
+        summary_data = summary_df_[summary_df_.Country.isin(reference_values)].reset_index(drop=True)
     else:
         summary_countries = [country_value] + reference_values
-        summary_data = summary_df[summary_df.Country.isin(summary_countries)].reset_index(drop=True)
-    world_info = summary_data[summary_data.Country == 'World']
-    from_q = summary_data[(summary_data.Country != 'World') & 
-        (summary_data.Population > 0)].Population\
-        .quantile(slider_value[0])
-    to_q = summary_data[(summary_data.Country != 'World') & 
-        (summary_data.Population > 0)].Population\
-        .quantile(slider_value[1])
-    summary_data = summary_data[(summary_data.Population >= from_q) & 
-        (summary_data.Population <= to_q)]
-    summary_data = summary_data.append(world_info, ignore_index=True)\
-        .sort_values('Total cases', ascending=False).reset_index(drop=True)
+        summary_data = summary_df_[summary_df_.Country.isin(summary_countries)].reset_index(drop=True) 
 
     return summary_data.to_dict('records')
 
