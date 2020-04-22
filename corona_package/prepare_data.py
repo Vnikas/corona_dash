@@ -43,7 +43,10 @@ def fix_version_issues(data):
         '^.*St. Martin.*$': 'Saint Martin',
         '^.*Verde*$': 'Cape Verde',
         '^.*Timor-Leste*$': 'East Timor',
-        '^.*Jersey*$': 'Channel Islands'
+        '^.*Jersey*$': 'United Kingdom',
+        '^.*Guernsey*$': 'United Kingdom',
+        'Channel Islands': 'United Kingdom',
+        'Vatican City': 'Holy See'
     }
 
     data['date'] = pd.to_datetime(data['date'])
@@ -60,10 +63,48 @@ def fix_version_issues(data):
 
 
 def aggregate_data(data):
-    data = data.groupby(['country', data.date]).sum().reset_index()
-    world_data = data.groupby('date').sum().reset_index()
+    continents_df = pd.read_csv('./data/continents.csv')
+    continents_df['country'] = continents_df.country_name.apply(lambda x: x.split(',')[0])
+
+    populations_df = pd.read_csv('./data/populations_df.csv')
+    world_population = populations_df.population.sum()
+    populations_df = populations_df.append({'country': 'World',
+                                            'population': world_population},
+                                           ignore_index=True)
+
+    populations_df = populations_df.merge(continents_df[['country', 'continent']], 
+        how='left', on='country')
+
+    populations_per_continent = populations_df.groupby('continent')\
+        .population.sum()\
+        .reset_index()
+    data = data.merge(populations_df, how='left', on='country')
+
+    agg_data = data.groupby(['country', 'continent', 'date'])\
+        .agg({'confirmed': 'sum',
+              'deaths': 'sum',
+              'population': 'max'}).reset_index()
+    
+    world_data = agg_data.groupby('date')[['confirmed', 'deaths']]\
+        .sum().reset_index()
+    world_data['population'] = world_population
     world_data['country'] = 'World'
-    data = pd.concat([data, world_data], axis=0).reset_index(drop=True)
+    world_data['continent'] = 'World'
+    agg_data = pd.concat([agg_data, world_data], axis=0).reset_index(drop=True)
+
+    continent_data = agg_data[agg_data.country != 'World'].groupby(['continent', 'date'])\
+        [['confirmed', 'deaths']].sum().reset_index()
+    continent_data['country'] = continent_data.continent
+    continent_data = continent_data.merge(populations_per_continent, 
+        how='left', 
+        on='continent')
+
+    agg_data = pd.concat([agg_data, continent_data], axis=0).reset_index(drop=True)
+
+    return agg_data
+
+
+def enhance_data(data, moving_period=7):
     data['daily_deaths'] = data.groupby('country')\
         .deaths.apply(lambda x: x - x.shift(1))\
         .fillna(0)\
@@ -72,17 +113,6 @@ def aggregate_data(data):
         .confirmed.apply(lambda x: x - x.shift(1)) \
         .fillna(0) \
         .map(int)
-    return data
-
-
-def enhance_data(data,
-                 moving_period=7):
-    populations_df = pd.read_csv('./data/populations_df.csv')
-    populations_df = populations_df.append({'country': 'World',
-                                            'population': populations_df.population.sum()},
-                                           ignore_index=True)
-    data = data.merge(populations_df, how='left', on='country')
-
     data['flat_ma'] = data.groupby('country').daily_deaths\
         .rolling(moving_period)\
         .mean()\
