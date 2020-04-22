@@ -131,3 +131,7 @@
   box-shadow: 0 0 0 5px darkorange;
   border-color: darkorange;
 }
+
+#ckecklist label {
+  color: darkorange;
+}

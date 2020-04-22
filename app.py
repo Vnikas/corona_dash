@@ -14,14 +14,14 @@ from dash_table.Format import Format, Scheme, Sign, Symbol
 data = pd.read_csv('./data/processed_data.csv')
 data.population = data.population.fillna(0).map(int)
 last_update = data.date.max()
-summary_df = pd.DataFrame(columns=['Country',
+summary_df = pd.DataFrame(columns=['Country / Continent',
                                    'Population',
                                    'Date of first case',
                                    'Date of first death',
                                    'Total cases',
                                    'Total deaths',
                                    'Deaths per million',
-                                   'Deaths to cases']).set_index('Country')
+                                   'Deaths to cases']).set_index('Country / Continent')
 
 summary_df['Population'] = data.groupby('country').population.max()
 summary_df['Date of first case'] = data.groupby('country').date.min()
@@ -32,7 +32,7 @@ summary_df['Deaths per million'] = summary_df['Total deaths'] / summary_df['Popu
 summary_df['Deaths to cases'] = summary_df['Total deaths'] / summary_df['Total cases']
 
 summary_df = summary_df.sort_values('Total cases', ascending=False).reset_index()
-summary_df = summary_df.rename(columns={'country': 'Country'})
+summary_df = summary_df.rename(columns={'country': 'Country / Continent'})
 
 ref_countries = [
     'United States',
@@ -61,7 +61,7 @@ def build_table(table_data):
         id='summary_table',
         data=table_data.to_dict('records'),
         columns=[
-            {'name': 'Country', 'id': 'Country', 'type': 'text'},
+            {'name': 'Country / Continent', 'id': 'Country / Continent', 'type': 'text'},
             {'name': 'Population', 'id': 'Population', 'type': 'numeric',
              'format': Format(group=',')},
             {'name': 'Date of first case', 'id': 'Date of first case', 'type': 'datetime'},
@@ -158,7 +158,7 @@ app.layout = html.Div([
                 dcc.Dropdown(
                     id='country_dropdown',
                     options=country_options,
-                    placeholder='Select Country...',
+                    placeholder='Select Country / Continent...',
                     searchable=True,
                     style={'background-color': '#303030',
                            'height': '50px',
@@ -181,7 +181,7 @@ app.layout = html.Div([
                 dcc.Dropdown(
                     id='reference_dropdown',
                     options=country_options,
-                    placeholder='Select Reference Countries...',
+                    placeholder='Select Reference Countries / Continents...',
                     multi=True,
                     searchable=True,
                     style={'background-color': '#303030',
@@ -224,13 +224,31 @@ app.layout = html.Div([
                     .75: {'label': '28M (Q3)'},
                     1: {'label': '1,5B'}
                 }
-            ) 
+            ),
+            dcc.Checklist(
+                options=[
+                    {'label': 'Africa', 'value': 'Africa'},
+                    {'label': 'Asia', 'value': 'Asia'},
+                    {'label': 'Europe', 'value': 'Europe'},
+                    {'label': 'North America', 'value': 'North America'},
+                    {'label': 'Oceania', 'value': 'Oceania'},
+                    {'label': 'South America', 'value': 'South America'}
+                    ],
+                value=['NYC', 'MTL'],
+                style={
+                    "padding": "20px", 
+                    "max-width": "1000px", 
+                    "margin": "0 auto",
+                    'font-size': 1},
+                labelStyle={'display': 'inline-block'}
+                )  
             ],
             className='12 columns', style={
                 'width': 800, 
                 'margin': '0 auto', 
                 'border': '1px lightgrey solid'}
-                )],
+                ),
+         ],
         className='row'),
     html.Div([
         html.Div([
@@ -320,11 +338,12 @@ app.layout = html.Div([
 )
 def update_table(country_value, reference_values, slider_value):
     # apply population filer
-    world_info = summary_df[summary_df.Country == 'World']
-    from_q = summary_df[(summary_df.Country != 'World') & 
+    world_info = summary_df[summary_df['Country / Continent'] == 'World']
+    continents = data.continent.unique().tolist()
+    from_q = summary_df[(~ summary_df['Country / Continent'].isin(continents)) & 
         (summary_df.Population > 0)].Population\
         .quantile(slider_value[0])
-    to_q = summary_df[(summary_df.Country != 'World') & 
+    to_q = summary_df[(summary_df['Country / Continent'] != 'World') & 
         (summary_df.Population > 0)].Population\
         .quantile(slider_value[1])
     summary_df_ = summary_df[(summary_df.Population >= from_q) & 
@@ -336,12 +355,12 @@ def update_table(country_value, reference_values, slider_value):
             (reference_values is None or len(reference_values) < 1):
         summary_data = summary_df_
     elif reference_values is None:
-        summary_data = summary_df_[summary_df_.Country == country_value].reset_index(drop=True)
+        summary_data = summary_df_[summary_df_['Country / Continent'] == country_value].reset_index(drop=True)
     elif country_value is None:
-        summary_data = summary_df_[summary_df_.Country.isin(reference_values)].reset_index(drop=True)
+        summary_data = summary_df_[summary_df_['Country / Continent'].isin(reference_values)].reset_index(drop=True)
     else:
         summary_countries = [country_value] + reference_values
-        summary_data = summary_df_[summary_df_.Country.isin(summary_countries)].reset_index(drop=True) 
+        summary_data = summary_df_[summary_df_['Country / Continent'].isin(summary_countries)].reset_index(drop=True) 
 
     return summary_data.to_dict('records')
 
