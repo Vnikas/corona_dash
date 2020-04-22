@@ -1,3 +1,9 @@
+#summary_table .dash-spreadsheet-container table {
+    --accent: darkorange !important;
+    --selected-background: darkorange !important;
+
+}
+
 #drop_single .VirtualizedSelectOption {
   background-color: '#303030';
   color: black;
@@ -132,6 +138,10 @@
   border-color: darkorange;
 }
 
-#ckecklist label {
-  color: darkorange;
+
+#checkbox 
+  .custom-control-input:checked
+  ~ .custom-control-label::before {
+  background-color: darkorange;
+  border-color: white;;
 }

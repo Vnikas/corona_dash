@@ -49,7 +49,10 @@ def plot_metric_evolution_per_country(data, country, metric):
                 'type': 'bar',
                 'yaxis': 'y2',
                 'hoverinfo': 'text',
-                'hovertext': df_['new_hovertexts']
+                'hovertext': df_['new_hovertexts'],
+                'marker': {
+                    'color': 'darkorange'
+                }
             }
         ],
         'layout': {
@@ -70,11 +73,11 @@ def plot_metric_trajectory(data, country, metric, is_main_country):
     if metric == 'confirmed':
         total_metric_text = 'Total Confirmed Cases'
         weekly_metric_text = 'Weekly Confirmed Cases'
-        title_text = 'Confirmed Cases'
+        title_text = 'confirmed cases'
     else:
         total_metric_text = 'Total Confirmed Deaths'
         weekly_metric_text = 'New Confirmed Deaths'
-        title_text = 'Confirmed Deaths'
+        title_text = 'confirmed deaths'
     metric_col = metric
     weekly_metric_col = 'weekly_' + metric
     daily_metric_col = 'daily_' + metric
@@ -140,7 +143,7 @@ def plot_metric_trajectory(data, country, metric, is_main_country):
             }
         ],
         'layout': {
-            'title': '<b>Trajectory of COVID-19 ' + title_text,
+            'title': '<b>Trajectory of ' + title_text,
             'yaxis': {
                 'title': weekly_metric_text + ' (in Past Week)',
                 'type': 'log'
@@ -260,7 +263,7 @@ def plot_flat_deaths(data,
                         'hoverinfo': 'none'
                     }],
         'layout': {
-            'title': '<b>Deaths in ' + country + '</b>',
+            'title': '<b>Daily deaths in ' + country + '</b>',
             'showlegend': False,
             'yaxis': {
                 'title': 'Deaths (7-day moving average)',
@@ -384,7 +387,7 @@ def plot_rate_deaths(data,
                         'hoverinfo': 'none'
                     }],
         'layout': {
-            'title': '<b>Death Rate in ' + country +'</b>',
+            'title': '<b>Daily death rate in ' + country +'</b>',
             'showlegend': False,
             'yaxis': {
                 'title': 'Death Rate (total deaths per million)',
