@@ -385,7 +385,7 @@ def update_table(
     else:
         summary_countries = [country_value] + reference_values
         summary_data = summary_df_[summary_df_['Country / Continent'].isin(summary_countries)].reset_index(drop=True) 
-    summary_data = summary_data[summary_data['Continent'].isin(checkbox_values)]    
+    summary_data = summary_data[summary_data['Continent'].isin(checkbox_values + ['World'])]    
     return summary_data.to_dict('records')
 
 # Update Plots
