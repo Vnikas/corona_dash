@@ -63,7 +63,19 @@ def plot_metric_evolution_per_country(data, country, metric):
                 'overlaying': 'y',
                 'showgrid': False,
                 'range': [0, upper_range]
-            }
+            },
+            'legend': {
+                'x': 1,
+                'y': 1.1,
+                'traceorder': 'normal',
+                'font': {
+                  'family': 'sans-serif',
+                  'size': 12
+                },
+                'bgcolor': None,
+                'bordercolor': '#FFFFFF',
+                'borderwidth': 1
+              } 
         }
     }
     return fig
