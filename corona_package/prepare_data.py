@@ -127,4 +127,5 @@ if __name__ == '__main__':
     agg_data = aggregate_data(data=fixed_data)
     data = enhance_data(data=agg_data)
     data.to_csv('./data/processed_data.csv', index=False)
+    print('Processed data until:', agg_data.date.dt.date.max())
 

@@ -13,7 +13,7 @@ max_date = date(1900,1,1)
 for date in dates:
 	url = prefix + date + '.csv'
 	try:
-		pd.read_csv(url).to_csv('~/corona_dash/data/raw_data/' + date + '.csv', index=False)
+		pd.read_csv(url).to_csv('./data/raw_data/' + date + '.csv', index=False)
 		max_date = date
 	except:
 		continue	
