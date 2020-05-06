@@ -143,5 +143,12 @@
   .custom-control-input:checked
   ~ .custom-control-label::before {
   background-color: darkorange;
+  border-color: white;
+}
+
+#countries_only_checkbox 
+  .custom-control-input:checked
+  ~ .custom-control-label::before {
+  background-color: darkorange;
   border-color: white;;
 }
