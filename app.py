@@ -14,7 +14,8 @@ from dash_table.Format import Format, Scheme, Sign, Symbol
 data = pd.read_csv('./data/processed_data.csv')
 data.population = data.population.fillna(0).map(int)
 last_update = data.date.max()
-summary_df = pd.DataFrame(columns=['Country / Continent',
+summary_df = pd.DataFrame(columns=['Rank',
+                                   'Country / Continent',
                                    'Continent',
                                    'Population',
                                    'Date of first case',
@@ -39,6 +40,7 @@ summary_df['Deaths per million'] = summary_df['Total deaths'] / summary_df['Popu
 summary_df['Deaths to cases'] = summary_df['Total deaths'] / summary_df['Total cases']
 
 summary_df = summary_df.sort_values('Total cases', ascending=False).reset_index()
+summary_df['Rank'] = summary_df.index + 1
 summary_df = summary_df.rename(columns={'country': 'Country / Continent',
                                         'continent': 'Continent'})
 
@@ -67,6 +69,7 @@ def build_table(table_data):
         id='summary_table',
         data=table_data.to_dict('records'),
         columns=[
+            {'name': 'Rank', 'id': 'Rank', 'type': 'numeric'},
             {'name': 'Country / Continent', 'id': 'Country / Continent', 'type': 'text'},
             {'name': 'Population', 'id': 'Population', 'type': 'numeric',
              'format': Format(group=',')},
@@ -231,6 +234,22 @@ app.layout = html.Div([
                     1: {'label': '1,5B'}
                 }
             ),
+            dbc.RadioItems(
+                id='countries_only_checkbox',
+                options=[
+                    {'label': 'Show all', 'value': 1},
+                    {'label': 'Show Countries only', 'value': 2},
+                    {'label': 'Show Continents only', 'value': 3}
+                    ],
+                value=1,
+                inline=True,
+                style={
+                    'text-align': 'center',
+                    'margin-bottom': 10,
+                    'margin-top': 10
+                    },
+                #switch=True,
+                ),  
             dbc.Checklist(
                 id='checkbox',
                 options=[
@@ -245,7 +264,8 @@ app.layout = html.Div([
                     'Oceania', 'South America'],
                 inline=True,
                 style={
-                    'text-align': 'center'
+                    'text-align': 'center',
+                    'margin-bottom': 10
                     },
                 switch=True,
                 )  
@@ -354,16 +374,20 @@ app.layout = html.Div([
     [Input(component_id='country_dropdown', component_property='value'),
      Input(component_id='reference_dropdown', component_property='value'),
      Input(component_id='slider', component_property='value'),
-     Input(component_id='checkbox', component_property='value')]
+     Input(component_id='checkbox', component_property='value'),
+     Input(component_id='countries_only_checkbox', component_property='value'),
+     Input(component_id='summary_table', component_property='sort_by')]
 )
 def update_table(
         country_value, 
         reference_values, 
         slider_values,
-        checkbox_values):
+        checkbox_values,
+        countries_only,
+        sort_by):
     # apply population filer
-    world_info = summary_df[summary_df['Country / Continent'] == 'World']
     continents = data.continent.unique().tolist()
+    world_info = summary_df[summary_df['Country / Continent'] == 'World']
     from_q = summary_df[(~ summary_df['Country / Continent'].isin(continents)) & 
         (summary_df.Population > 0)].Population\
         .quantile(slider_values[0])
@@ -385,7 +409,20 @@ def update_table(
     else:
         summary_countries = [country_value] + reference_values
         summary_data = summary_df_[summary_df_['Country / Continent'].isin(summary_countries)].reset_index(drop=True) 
-    summary_data = summary_data[summary_data['Continent'].isin(checkbox_values + ['World'])]    
+    # apply continent filter
+    summary_data = summary_data[summary_data['Continent'].isin(checkbox_values + ['World'])].reset_index(drop=True)  
+    # apply countries only filter
+    if countries_only == 2:
+        summary_data = summary_data[~ summary_data['Country / Continent'].isin(continents)].reset_index(drop=True)
+    elif countries_only == 3:
+        summary_data = summary_data[summary_data['Country / Continent'].isin(continents)].reset_index(drop=True)
+    if sort_by:
+        summary_data = summary_data.sort_values(
+            sort_by[0]['column_id'],
+            ascending=sort_by[0]['direction'] == 'asc',
+            inplace=False)\
+            .reset_index(drop=True)
+    summary_data['Rank'] = summary_data.index + 1  
     return summary_data.to_dict('records')
 
 # Update Plots
