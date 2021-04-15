@@ -16,8 +16,6 @@ Ideas for plots came from [here](https://www.ft.com/coronavirus-latest) and [her
 ## Tutorials (for MacOS)
 1. Git clone.
 ```bash
-$ mkdir ~/corona_dash
-$ cd ~/corona_dash
 $ git clone https://github.com/Vnikas/corona_dash.git
 ```
 2. Create a virtual environment and install all packages needed.

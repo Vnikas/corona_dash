@@ -1,10 +1,15 @@
 import pandas as pd
 from datetime import date, timedelta
+import pathlib
+
+# Create the directory needed to save the raw data, if not already there.
+pathlib.Path('./data/raw_data/').mkdir(exist_ok=True)
 
 prefix = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/'
 
-first_date = date(2020,1,22)
 last_date = date.today()
+first_date = last_date - timedelta(days=30) # the actual first date of data is 2020-01-22 but we only udtate the 30 last days
+
 num_days = (last_date - first_date).days
 dates = [(first_date + timedelta(days=d)).strftime(format='%m-%d-%Y') for d in range(num_days)]
 urls = [prefix + date + '.csv' for date in dates]
