@@ -37,7 +37,7 @@ def plot_metric_evolution_per_country(data, country, metric):
                 'x': df_.date,
                 'y': df_[metric_col],
                 'mode': 'markers+lines',
-                'name': 'Total Cases',
+                'name': total_metric_text,
                 'marker': {'size': 8},
                 'hoverinfo': 'text',
                 'hovertext': df_['total_hovertexts']
@@ -45,7 +45,7 @@ def plot_metric_evolution_per_country(data, country, metric):
             {
                 'x': df_.date,
                 'y': df_[daily_metric_col],
-                'name': 'New Cases',
+                'name': new_metric_text,
                 'type': 'bar',
                 'yaxis': 'y2',
                 'hoverinfo': 'text',
